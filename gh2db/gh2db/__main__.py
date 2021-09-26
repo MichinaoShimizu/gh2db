@@ -1,17 +1,17 @@
 from argparse import ArgumentParser
-from dbbase import BaseSession
+from .dbbase import BaseSession
 from github import Github
-from logger import get_logger
+from .logger import get_logger
 
-from model import GithubUser
-from model import GithubUserRepository
+from .model import GithubUser
+from .model import GithubUserRepository
 # from model import GithubUserRepositoryPullRequest
-from model import GithubOrganization
-from model import GithubOrganizationTeam
+from .model import GithubOrganization
+from .model import GithubOrganizationTeam
 # from model import GithubOrganizationUser
-from model import GithubOrganizationRepository
+from .model import GithubOrganizationRepository
 # from model import GithubOrganizationRepositoryPullRequest
-from migration import Migration
+from .migration import Migration
 
 import os
 from dotenv import load_dotenv
