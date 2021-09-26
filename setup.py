@@ -13,7 +13,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="gh2db",
-    version="0.1.0",
+    version="0.1.1",
     author="MichinaoShimizu",
     author_email="",
     description="Convert Github Data to Database.",
@@ -29,7 +29,7 @@ setuptools.setup(
     ],
     entry_points={
         'console_scripts': [
-            'mysumy = gh2db.gh2db.__main__:main',
+            'gh2db = gh2db.gh2db.__main__:main',
         ]
     },
     python_requires='>=3.6',
