@@ -1,15 +1,15 @@
 from __future__ import print_function
-from gh2db.migration import Migration
-from gh2db.model import GithubOrganizationRepository
-from gh2db.model import GithubOrganizationTeam
-from gh2db.model import GithubOrganization
-from gh2db.model import GithubUserRepository
-from gh2db.model import GithubUser
-from gh2db.logger import get_logger
-from gh2db.dbbase import BaseSession
+import os
 from argparse import ArgumentParser
 from github import Github
-import os
+from gh2db.dbbase import BaseSession
+from gh2db.logger import get_logger
+from gh2db.model import GithubUser
+from gh2db.model import GithubUserRepository
+from gh2db.model import GithubOrganization
+from gh2db.model import GithubOrganizationTeam
+from gh2db.model import GithubOrganizationRepository
+from gh2db.migration import Migration
 from dotenv import load_dotenv
 load_dotenv()
 logger = get_logger(__name__)
@@ -28,43 +28,51 @@ def get_option():
 
 def main():
     args = get_option()
+
     # Create tables
     if args.create_all:
-        logger.info('create all tables')
-        return Migration().create_all()
+        logger.info('Create all tables start')
+        Migration().create_all()
+        return 0
 
     # Drop tables
     if args.drop_all:
-        logger.info('drop all tables')
-        return Migration().drop_all()
+        logger.info('Drop all tables start')
+        Migration().drop_all()
+        return 0
 
     # Count all of table rows
     if args.count_all:
-        logger.info('count all of table rows')
-        return Migration().count_all()
+        logger.info('Count all of table rows start')
+        Migration().count_all()
+        return 0
 
     # Delete all of table rows
     if args.delete_all:
-        logger.info('delete all of table rows')
-        return Migration().delete_all()
+        logger.info('Delete all of table rows start')
+        Migration().delete_all()
+        return 0
 
-    # Establish GitHub API Connection
+    # GitHub API
     gh = Github(os.environ['GITHUB_TOKEN'])
-    logger.info('github api authorize ok')
+    logger.info('GitHub API authorized OK')
 
-    # Rate Limitting
-    logger.info('github api rate limitting:')
-    logger.info(gh.rate_limiting)
-    logger.info(gh.get_rate_limit().core.reset)
+    # GitHub API Rate Limitting
+    logger.info('Github API Rate Limitting:')
+    logger.info(' Remaining, Limit: {}'.format(gh.rate_limiting))
+    logger.info(' ResetTime: {}'.format(gh.get_rate_limit().core.reset))
 
-    # Establish Database Connection
-    if args.update_user_repos or args.update_org_repos:
+    # Database Session
+    need_db_session = args.update_user_repos or args.update_org_repos
+    if need_db_session:
         db = BaseSession().session
-        logger.info('database session established')
+        logger.info('Database session established')
 
-    # Update Database (exeusion user data)
+    # Update (exeusion user data)
     if args.update_user_repos:
-        logger.info('update database(exeusion user data)')
+        logger.info('Update database(exeusion user data) start')
+
+        # Execusion User Data
         github_user = gh.get_user()
         _user = GithubUser()
         _user.id = github_user.id,
@@ -73,8 +81,9 @@ def main():
         _user.avatar_url = github_user.avatar_url,
         _user.created_at = github_user.created_at,
         _user.updated_at = github_user.updated_at,
-        db.add(_user)
+        db.merge(_user)
 
+        # User Repositories
         user_repositories = github_user.get_repos(visibility='all')
         if user_repositories.totalCount > 0:
             logger.info(user_repositories.totalCount)
@@ -88,21 +97,22 @@ def main():
                 _repo.default_branch = repo.default_branch
                 _repo.created_at = repo.created_at
                 _repo.updated_at = repo.updated_at
-                db.add(_repo)
+                db.merge(_repo)
 
     # Update Database (organization data)
     if args.update_org_repos:
-        logger.info('update database(organization data)')
+        logger.info('Update database(organization data)')
+
+        # Organizations
         organizations = gh.get_organizations()
         if organizations.totalCount > 0:
-            approved_org_name = os.environ['APPROVED_ORGANIZATION_NAME']
             logger.info(organizations.totalCount)
+            target_org_name = os.environ['GITHUB_TARGET_ORGANIZATION_NAME']
             for org in organizations:
-                logger.info(org.name)
-                if approved_org_name and (org.name != approved_org_name):
-                    logger.info(f'org {org.name} was skipped')
+                if org.name != target_org_name:
                     continue
 
+                logger.info(org.name)
                 _org = GithubOrganization()
                 _org.id = org.id
                 _org.name = org.name
@@ -110,8 +120,9 @@ def main():
                 _org.avatar_url = org.avatar_url
                 _org.created_at = org.created_at
                 _org.updated_at = org.updated_at
-                db.add(_org)
+                db.merge(_org)
 
+                # Organization Teams
                 org_teams = org.get_teams()
                 if org_teams.totalCount > 0:
                     logger.info(org_teams.totalCount)
@@ -124,8 +135,9 @@ def main():
                         _team.avatar_url = team.avatar_url
                         _team.created_at = team.created_at
                         _team.updated_at = team.updated_at
-                        db.add(_team)
+                        db.merge(_team)
 
+                # Organization Repositories
                 organization_repositories = org.get_repos(visibility='all')
                 if organization_repositories.totalCount > 0:
                     logger.info(organization_repositories.totalCount)
@@ -139,20 +151,20 @@ def main():
                         _repo.default_branch = repo.default_branch
                         _repo.created_at = repo.created_at
                         _repo.updated_at = repo.updated_at
-                        db.add(_repo)
+                        db.merge(_repo)
 
-    if args.update_user_repos or args.update_org_repos:
+    if need_db_session:
         try:
             db.commit()
-            logger.info('committed')
+            logger.info('Database committed')
         except Exception as e:
-            logger.info('commit error')
+            logger.info('Database commit error')
             db.rollback()
-            logger.info('rollbacked')
+            logger.info('Database rollbacked')
             raise(e)
         finally:
             db.close()
-            logger.info('closed')
+            logger.info('Database session closed')
 
     return 0
 

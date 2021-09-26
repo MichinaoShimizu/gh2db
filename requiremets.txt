@@ -3,3 +3,4 @@ coloredlogs
 sqlalchemy
 mysqlclient
 python-dotenv
+sqlalchemy-utils

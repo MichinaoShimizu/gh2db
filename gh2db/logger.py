@@ -1,3 +1,4 @@
+from __future__ import print_function
 from logging import getLogger, StreamHandler, DEBUG
 import coloredlogs
 import sys
@@ -10,5 +11,4 @@ def get_logger(module):
     logger.propagate = False
     coloredlogs.DEFAULT_LOG_FORMAT = '[%(asctime)s %(levelname)s %(name)s:%(lineno)s] %(message)s'
     coloredlogs.install(level='DEBUG', logger=logger)
-
     return logger

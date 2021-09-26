@@ -2,18 +2,18 @@
 
 ## Usage
 
-generate `.env` file.
+create `.env` file.
 
 ```bash
 GITHUB_TOKEN=
-APPROVED_ORGANIZATION_NAME=
+GITHUB_TARGET_ORGANIZATION_NAME=
 
-DB_DIALECT=mysql
+DB_DIALECT=
 DB_USERNAME=
 DB_PASSWORD=
-DB_HOSTNAME=localhost
-DB_PORT=22
-DB_NAME=gh
+DB_HOSTNAME=
+DB_PORT=
+DB_NAME=
 DB_ECHO_TYPE=0
 ```
 

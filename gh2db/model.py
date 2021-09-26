@@ -1,3 +1,4 @@
+from __future__ import print_function
 from sqlalchemy import Column, String, Text, Integer, DateTime
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 
