@@ -1,20 +1,16 @@
 from argparse import ArgumentParser
-from .dbbase import BaseSession
 from github import Github
-from .logger import get_logger
-
-from .model import GithubUser
-from .model import GithubUserRepository
-# from model import GithubUserRepositoryPullRequest
-from .model import GithubOrganization
-from .model import GithubOrganizationTeam
-# from model import GithubOrganizationUser
-from .model import GithubOrganizationRepository
-# from model import GithubOrganizationRepositoryPullRequest
-from .migration import Migration
-
 import os
 from dotenv import load_dotenv
+
+from .dbbase import BaseSession
+from .logger import get_logger
+from .model import GithubUser
+from .model import GithubUserRepository
+from .model import GithubOrganization
+from .model import GithubOrganizationTeam
+from .model import GithubOrganizationRepository
+from .migration import Migration
 
 
 def get_option():
@@ -151,6 +147,10 @@ if __name__ == '__main__':
         exit_code = main()
         exit(exit_code)
     except KeyboardInterrupt:
+        exit(1)
+    except KeyError as e:
+        logger.error(e)
+        logger.info('please generate .env file')
         exit(1)
     except Exception as e:
         logger.error(e)
