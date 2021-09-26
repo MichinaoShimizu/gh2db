@@ -13,7 +13,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="gh2db",
-    version="0.1.2",
+    version="0.1.3",
     author="MichinaoShimizu",
     author_email="",
     description="Convert Github Data to Database.",

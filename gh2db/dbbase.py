@@ -15,7 +15,6 @@ class BaseEngine(object):
             os.environ['DB_PORT'],
             os.environ['DB_NAME']
         )
-
         echo_type = False
         if os.environ['DB_ECHO_TYPE'] == '1':
             echo_type = True

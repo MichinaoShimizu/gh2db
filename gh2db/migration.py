@@ -1,13 +1,13 @@
-from .dbbase import BaseEngine, BaseSession
-from .model import Base
-from .model import GithubUser
-from .model import GithubUserRepository
-from .model import GithubUserRepositoryPullRequest
-from .model import GithubOrganization
-from .model import GithubOrganizationTeam
-from .model import GithubOrganizationUser
-from .model import GithubOrganizationRepository
-from .model import GithubOrganizationRepositoryPullRequest
+from gh2db.dbbase import BaseEngine, BaseSession
+from gh2db.model import Base
+from gh2db.model import GithubUser
+from gh2db.model import GithubUserRepository
+from gh2db.model import GithubUserRepositoryPullRequest
+from gh2db.model import GithubOrganization
+from gh2db.model import GithubOrganizationTeam
+from gh2db.model import GithubOrganizationUser
+from gh2db.model import GithubOrganizationRepository
+from gh2db.model import GithubOrganizationRepositoryPullRequest
 
 
 class Migration(object):

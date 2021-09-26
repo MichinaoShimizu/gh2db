@@ -1,3 +1,4 @@
+from __future__ import print_function
 from gh2db.migration import Migration
 from gh2db.model import GithubOrganizationRepository
 from gh2db.model import GithubOrganizationTeam
@@ -11,6 +12,7 @@ from github import Github
 import os
 from dotenv import load_dotenv
 load_dotenv()
+logger = get_logger(__name__)
 
 
 def get_option():
@@ -26,35 +28,43 @@ def get_option():
 
 def main():
     args = get_option()
-
     # Create tables
     if args.create_all:
+        logger.info('create all tables')
         return Migration().create_all()
 
     # Drop tables
     if args.drop_all:
+        logger.info('drop all tables')
         return Migration().drop_all()
 
     # Count all of table rows
     if args.count_all:
+        logger.info('count all of table rows')
         return Migration().count_all()
 
     # Delete all of table rows
     if args.delete_all:
+        logger.info('delete all of table rows')
         return Migration().delete_all()
 
     # Establish GitHub API Connection
     gh = Github(os.environ['GITHUB_TOKEN'])
+    logger.info('github api authorize ok')
 
     # Rate Limitting
+    logger.info('github api rate limitting:')
     logger.info(gh.rate_limiting)
     logger.info(gh.get_rate_limit().core.reset)
 
     # Establish Database Connection
-    db = BaseSession().session
+    if args.update_user_repos or args.update_org_repos:
+        db = BaseSession().session
+        logger.info('database session established')
 
-    # Update Database (exeusion user's information)
+    # Update Database (exeusion user data)
     if args.update_user_repos:
+        logger.info('update database(exeusion user data)')
         github_user = gh.get_user()
         _user = GithubUser()
         _user.id = github_user.id,
@@ -80,8 +90,9 @@ def main():
                 _repo.updated_at = repo.updated_at
                 db.add(_repo)
 
-    # Update Database (organization's information)
+    # Update Database (organization data)
     if args.update_org_repos:
+        logger.info('update database(organization data)')
         organizations = gh.get_organizations()
         if organizations.totalCount > 0:
             approved_org_name = os.environ['APPROVED_ORGANIZATION_NAME']
@@ -130,22 +141,24 @@ def main():
                         _repo.updated_at = repo.updated_at
                         db.add(_repo)
 
-    try:
-        db.commit()
-        logger.info('committed')
-    except Exception as e:
-        logger.info('commit error')
-        db.rollback()
-        logger.info('rollbacked')
-        raise(e)
-    finally:
-        db.close()
-        logger.info('closed')
+    if args.update_user_repos or args.update_org_repos:
+        try:
+            db.commit()
+            logger.info('committed')
+        except Exception as e:
+            logger.info('commit error')
+            db.rollback()
+            logger.info('rollbacked')
+            raise(e)
+        finally:
+            db.close()
+            logger.info('closed')
+
+    return 0
 
 
 if __name__ == '__main__':
     try:
-        logger = get_logger(__name__)
         exit_code = main()
         exit(exit_code)
     except KeyboardInterrupt:
