@@ -1,13 +1,12 @@
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 import os
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
+# load_dotenv()
 
 
 class BaseEngine(object):
     def __init__(self):
-        load_dotenv()
-
         url = '{}://{}:{}@{}:{}/{}'.format(
             os.environ['DB_DIALECT'],
             os.environ['DB_USERNAME'],

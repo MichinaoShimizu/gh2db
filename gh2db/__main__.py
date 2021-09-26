@@ -1,16 +1,16 @@
+from gh2db.migration import Migration
+from gh2db.model import GithubOrganizationRepository
+from gh2db.model import GithubOrganizationTeam
+from gh2db.model import GithubOrganization
+from gh2db.model import GithubUserRepository
+from gh2db.model import GithubUser
+from gh2db.logger import get_logger
+from gh2db.dbbase import BaseSession
 from argparse import ArgumentParser
 from github import Github
 import os
 from dotenv import load_dotenv
-
-from .dbbase import BaseSession
-from .logger import get_logger
-from .model import GithubUser
-from .model import GithubUserRepository
-from .model import GithubOrganization
-from .model import GithubOrganizationTeam
-from .model import GithubOrganizationRepository
-from .migration import Migration
+load_dotenv()
 
 
 def get_option():
@@ -45,7 +45,10 @@ def main():
 
     # Establish GitHub API Connection
     gh = Github(os.environ['GITHUB_TOKEN'])
-    logger.info(f"rate_limit:{gh.rate_limiting} untill {gh.get_rate_limit().core.reset}")
+
+    # Rate Limitting
+    logger.info(gh.rate_limiting)
+    logger.info(gh.get_rate_limit().core.reset)
 
     # Establish Database Connection
     db = BaseSession().session
@@ -142,15 +145,10 @@ def main():
 
 if __name__ == '__main__':
     try:
-        load_dotenv()
         logger = get_logger(__name__)
         exit_code = main()
         exit(exit_code)
     except KeyboardInterrupt:
-        exit(1)
-    except KeyError as e:
-        logger.error(e)
-        logger.info('please generate .env file')
         exit(1)
     except Exception as e:
         logger.error(e)
