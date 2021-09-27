@@ -63,6 +63,8 @@ def main():
 
     if args.update_user_repos or args.update_org_repos:
         github = Github(os.environ.get('GH2DB_GITHUB_TOKEN', ''))
+        github.per_page = int(os.environ.get('GH2DB_GITHUB_PER_PAGE', 50))
+
         logger.info('---------------------------')
         logger.info('GitHub API Authorized By Personal AccessToken: OK')
         logger.info('Github API Rate Limitting Information:')
@@ -74,12 +76,20 @@ def main():
 
         if args.update_user_repos:
             logger.info('Create User Model')
+
+            # see https://docs.github.com/en/rest/reference/users
             user = github.get_user()
+
             model = GithubUsers.createFromGitHub(user)
             db.merge(model)
 
             logger.info(f' Repository Models (User:{user.name})')
-            repositories = user.get_repos(visibility='all')
+
+            # see https://docs.github.com/en/rest/reference/repos
+            repositories = user.get_repos(
+                visibility='all'
+            )
+
             for repository in repositories:
                 model = GithubRepositories.createFromGitHub(repository)
                 db.merge(model)
@@ -91,16 +101,22 @@ def main():
                     db.merge(model)
 
                 logger.info(f'  Pull Request Models (Repository:{repository.full_name})')
+
+                # see http://docs.github.com/en/rest/reference/pulls
                 pull_requests = repository.get_pulls(
                     state='closed',
-                    sort='merged',
+                    sort='updated',
+                    direction='desc',
                     base=repository.default_branch
                 )
+
                 for pull_request in pull_requests:
                     model = GithubRepositoryPullRequests.createFromGitHub(pull_request)
                     db.merge(model)
 
                     logger.info(f'   Pull Request Label Models (#{pull_request.number})')
+
+                    # see https://docs.github.com/en/rest/reference/issues#labels
                     pull_request_labels = pull_request.get_labels()
                     for pull_request_label in pull_request_labels:
                         model = GithubRepositoryPullRequestLabels.createFromGitHub(
@@ -108,6 +124,8 @@ def main():
                         db.merge(model)
 
                     logger.info(f'   Review Models (#{pull_request.number})')
+
+                    # see https://docs.github.com/en/rest/reference/pulls#reviews
                     reviews = pull_request.get_reviews()
                     for review in reviews:
                         model = GithubRepositoryPullRequestReviews.createFromGitHub(
@@ -115,6 +133,8 @@ def main():
                         db.merge(model)
 
                     logger.info(f'   Commit Models (#{pull_request.number})')
+
+                    # see https://docs.github.com/en/rest/reference/pulls#list-commits-on-a-pull-request
                     commits = pull_request.get_commits()
                     for commit in commits:
                         model = GithubRepositoryPullRequestCommits.createFromGitHub(
@@ -125,45 +145,63 @@ def main():
             target_org_name = os.environ.get('GH2DB_GITHUB_TARGET_ORGANIZATION_NAME', '')
 
             logger.info(f'Organization Model ({target_org_name})')
+
+            # see https://docs.github.com/en/rest/reference/orgs#get-an-organization
             organization = github.get_organization(target_org_name)
             model = GithubOrganizations.createFromGitHub(organization)
             db.merge(model)
 
             logger.info(f' Team Models (Organization:{organization.name})')
+
+            # see https://docs.github.com/en/rest/reference/teams#list-teams
             teams = organization.get_teams()
             for team in teams:
                 model = GithubOrganizationTeams(organization, team)
                 db.merge(model)
 
                 logger.info(f'  Team Member Models (Team:{team.name})')
-                team_member = team.get_members()
-                for member in team_member:
+
+                # see https://docs.github.com/en/rest/reference/teams#list-team-members
+                team_members = team.get_members()
+                for member in team_members:
                     model = GithubOrganizationTeamMembers(organization, team, member)
                     db.merge(model)
 
             logger.info(f' Repository Models (Organization:{organization.name})')
-            repositories = organization.get_repos(visibility='all')
+
+            # see https://docs.github.com/en/rest/reference/repos#list-organization-repositories
+            repositories = organization.get_repos(
+                visibility='all'
+            )
+
             for repository in repositories:
                 model = GithubRepositories.createFromGitHub(repository)
                 db.merge(model)
 
                 logger.info(f'  Label Models (Repository:{repository.full_name})')
+
+                # see https://docs.github.com/en/rest/reference/issues#labels
                 labels = repository.get_labels()
                 for label in labels:
                     model = GithubRepositoryLabels.createFromGitHub(repository, label)
                     db.merge(model)
 
                 logger.info(f'  Pull Request Models (Organization:{organization.name})')
+
+                # see https://docs.github.com/en/rest/reference/pulls
                 pull_requests = repository.get_pulls(
                     state='closed',
                     sort='merged',
                     base=repository.default_branch
                 )
+
                 for pull_request in pull_requests:
                     model = GithubRepositoryPullRequests.createFromGitHub(pull_request)
                     db.merge(model)
 
                     logger.info(f'   Pull Request Label Models (#{pull_request.number})')
+
+                    # see https://docs.github.com/en/rest/reference/issues#labels
                     pull_request_labels = pull_request.get_labels()
                     for pull_request_label in pull_request_labels:
                         model = GithubRepositoryPullRequestLabels.createFromGitHub(
@@ -171,6 +209,8 @@ def main():
                         db.merge(model)
 
                     logger.info(f'   Review Models (#{pull_request.number})')
+
+                    # see https://docs.github.com/en/rest/reference/pulls#reviews
                     reviews = pull_request.get_reviews()
                     for review in reviews:
                         model = GithubRepositoryPullRequestReviews.createFromGitHub(
@@ -178,6 +218,8 @@ def main():
                         db.merge(model)
 
                     logger.info(f'  Commit Models (#{pull_request.number})')
+
+                    # see https://docs.github.com/en/rest/reference/pulls#list-commits-on-a-pull-request
                     commits = pull_request.get_commits()
                     for commit in commits:
                         model = GithubRepositoryPullRequestCommits.createFromGitHub(

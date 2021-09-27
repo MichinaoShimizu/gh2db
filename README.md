@@ -11,13 +11,14 @@ pip3 install git+https://github.com/MichinaoShimizu/gh2db
 ```bash
 export GH2DB_GITHUB_TOKEN=xxx
 export GH2DB_GITHUB_TARGET_ORGANIZATION_NAME=
+export GH2DB_GITHUB_PER_PAGE=100
 export GH2DB_DB_DIALECT=mysql
 export GH2DB_DB_USERNAME=
 export GH2DB_DB_PASSWORD=
 export GH2DB_DB_HOSTNAME=localhost
 export GH2DB_DB_PORT=22
 export GH2DB_DB_NAME=gh
-export GH2DB_DB_LOG_LEVEL=DEBUG
+export GH2DB_DB_LOG_LEVEL=ERROR
 export GH2DB_APP_LOG_LEVEL=INFO
 ```
 
