@@ -39,6 +39,25 @@ usage: [-h] [--update_user_repos] [--update_org_repos] [--create_all] [--drop_al
 gh2db --create_all
 ```
 
+```sql
+mysql> show tables;
++----------------------------------------+
+| Tables_in_gh                           |
++----------------------------------------+
+| github_organization_team_members       |
+| github_organization_teams              |
+| github_organizations                   |
+| github_repositories                    |
+| github_repository_labels               |
+| github_repository_pull_request_commits |
+| github_repository_pull_request_labels  |
+| github_repository_pull_request_reviews |
+| github_repository_pull_requests        |
+| github_users                           |
++----------------------------------------+
+10 rows in set (0.00 sec)
+```
+
 ### Drop Tables
 
 ```bash
