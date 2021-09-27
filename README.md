@@ -39,8 +39,7 @@ usage: [-h] [--update_user_repos] [--update_org_repos] [--create_all] [--drop_al
 gh2db --create_all
 ```
 
-```sql
-mysql> show tables;
+```bash
 +----------------------------------------+
 | Tables_in_gh                           |
 +----------------------------------------+
