@@ -21,47 +21,40 @@ logger = get_module_logger(__name__)
 
 def get_option():
     parser = ArgumentParser()
-    parser.add_argument('--update_user_repos', action='store_true', help='Update User Data')
-    parser.add_argument('--update_org_repos', action='store_true', help='Update Organization Data')
-    parser.add_argument('--create_all', action='store_true', help='Create All Tables')
-    parser.add_argument('--drop_all', action='store_true', help='Drop All Tables')
-    parser.add_argument('--delete_all', action='store_true', help='Delete All Table Data')
-    parser.add_argument('--count_all', action='store_true', help='Count All Table Rows')
+    parser.add_argument('--update_user', action='store_true', help='Update User Data')
+    parser.add_argument('--update_org', action='store_true', help='Update Organization Data')
+    parser.add_argument('--create', action='store_true', help='Create All Tables')
+    parser.add_argument('--drop', action='store_true', help='Drop All Tables')
+    parser.add_argument('--delete', action='store_true', help='Delete All Table Data')
+    parser.add_argument('--count', action='store_true', help='Count All Table Rows')
     return parser.parse_args()
 
 
 def main():
     args = get_option()
 
-    if args.create_all:
+    if args.create:
         logger.info('Create all tables start')
         Migration().create_all()
         logger.info('Create all tables completed')
 
         return 0
 
-    if args.drop_all:
+    if args.drop:
         logger.info('Drop all tables start')
         Migration().drop_all()
         logger.info('Drop all tables completed')
 
         return 0
 
-    if args.count_all:
-        logger.info('Count all of table rows start')
-        Migration().count_all()
-        logger.info('Count all of table rows completed')
-
-        return 0
-
-    if args.delete_all:
+    if args.delete:
         logger.info('Delete all of table rows start')
         Migration().delete_all()
         logger.info('Delete all of table rows completed')
 
         return 0
 
-    if args.update_user_repos or args.update_org_repos:
+    if args.update_user or args.update_org:
         github = Github(os.environ.get('GH2DB_GITHUB_TOKEN', ''))
         github.per_page = int(os.environ.get('GH2DB_GITHUB_PER_PAGE', 50))
 
@@ -74,7 +67,7 @@ def main():
 
         db = BaseSession().session
 
-        if args.update_user_repos:
+        if args.update_user:
             logger.info('User Model')
             # see https://docs.github.com/en/rest/reference/users
             user = github.get_user()
@@ -147,7 +140,7 @@ def main():
                             repository, pull_request, commit)
                         db.merge(model)
 
-        if args.update_org_repos:
+        if args.update_org:
             target_org_name = os.environ.get('GH2DB_GITHUB_TARGET_ORGANIZATION_NAME', '')
 
             logger.info(f'Organization Model ({target_org_name})')

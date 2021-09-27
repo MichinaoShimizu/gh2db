@@ -1,5 +1,7 @@
 from __future__ import print_function
 
+from sqlalchemy_utils import create_database, database_exists
+
 from .dbbase import BaseEngine, BaseSession
 from .logger import get_module_logger
 from .model import (Base, GithubOrganizations, GithubOrganizationTeamMembers,
@@ -30,6 +32,11 @@ class Migration(object):
         self.e = BaseEngine().engine
 
     def create_all(self):
+        if not database_exists(self.e.url):
+            logger.info('Database is not exist.Try Create Database.')
+            create_database(self.e.url)
+            logger.info('Database create complete.')
+
         Base.metadata.create_all(self.e)
 
     def drop_all(self):

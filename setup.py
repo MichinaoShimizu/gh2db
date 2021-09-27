@@ -1,5 +1,6 @@
-import setuptools
 import os
+
+import setuptools
 
 basedir = os.path.dirname(os.path.realpath(__file__))
 requirements = basedir + "/requirements.txt"
@@ -13,11 +14,11 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="gh2db",
-    version="0.1.3",
+    version="0.1.4",
     author="MichinaoShimizu",
     author_email="",
-    description="Convert Github Data to Database.",
-    long_description="Convert Github Data to Database.",
+    description="Migrate Github Data to Database.",
+    long_description="Migrate Github Data to Database.",
     long_description_content_type="text/markdown",
     install_requires=install_requires,
     url="https://github.com/MichinaoShimizu/gh2db",
