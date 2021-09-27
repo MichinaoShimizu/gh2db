@@ -85,7 +85,7 @@ $ gh2db --update_user_repos
 [2021-09-27 21:28:00 INFO] Remaining, Limit: (4441, 5000)
 [2021-09-27 21:28:01 INFO] ResetTime: 2021-09-27 12:49:21
 [2021-09-27 21:28:01 INFO] ---------------------------
-[2021-09-27 21:28:01 INFO] Create User Model
+[2021-09-27 21:28:01 INFO] User Model
 [2021-09-27 21:28:01 INFO]  Repository Models (User:mshimizu)
 [2021-09-27 21:28:02 INFO]   Label Models (Repository:MichinaoShimizu/anemone)
 [2021-09-27 21:28:02 INFO]   Pull Request Models (Repository:MichinaoShimizu/anemone)
