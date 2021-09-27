@@ -1,16 +1,18 @@
 from __future__ import print_function
+
 import os
 from argparse import ArgumentParser
+
 from github import Github
+
 from gh2db.dbbase import BaseSession
-from gh2db.logger import get_logger
-from gh2db.model import GithubUser
-from gh2db.model import GithubUserRepository
-from gh2db.model import GithubOrganization
-from gh2db.model import GithubOrganizationTeam
-from gh2db.model import GithubOrganizationRepository
+from gh2db.logger import get_module_logger
 from gh2db.migration import Migration
-logger = get_logger(__name__)
+from gh2db.model import (GithubOrganization, GithubOrganizationRepository,
+                         GithubOrganizationTeam, GithubUser,
+                         GithubUserRepository)
+
+logger = get_module_logger(__name__)
 
 
 def get_option():
@@ -52,7 +54,7 @@ def main():
         return 0
 
     # GitHub API
-    gh = Github(os.environ.get('GH2DB_GITHUB_TOKEN'))
+    gh = Github(os.environ.get('GH2DB_GITHUB_TOKEN', ''))
     logger.info('GitHub API authorized OK')
 
     # GitHub API Rate Limitting
@@ -105,7 +107,7 @@ def main():
         organizations = gh.get_organizations()
         if organizations.totalCount > 0:
             logger.info(organizations.totalCount)
-            target_org_name = os.environ.get('GH2DB_GITHUB_TARGET_ORGANIZATION_NAME')
+            target_org_name = os.environ.get('GH2DB_GITHUB_TARGET_ORGANIZATION_NAME', '')
             for org in organizations:
                 if org.name != target_org_name:
                     continue

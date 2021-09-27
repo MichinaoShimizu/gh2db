@@ -1,6 +1,11 @@
 from __future__ import print_function
-from sqlalchemy import Column, String, Text, Integer, DateTime
+
+from sqlalchemy import Column, DateTime, Integer, String, Text
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
+
+from .logger import get_module_logger
+
+logger = get_module_logger(__name__)
 
 
 @declarative_base

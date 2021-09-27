@@ -1,14 +1,24 @@
 from __future__ import print_function
-from logging import getLogger, StreamHandler, DEBUG
-import coloredlogs
+
+import os
 import sys
+from logging import StreamHandler, getLogger
+
+import coloredlogs
 
 
-def get_logger(module):
+def handle_db_logger():
+    logger = getLogger('sqlalchemy.engine')
+    logger.addHandler(StreamHandler(sys.stderr))
+    logger.propagate = False
+    coloredlogs.DEFAULT_LOG_FORMAT = '[%(asctime)s %(levelname)s] %(message)s'
+    coloredlogs.install(level=os.environ.get('GH2DB_LOG_LEVEL', 'INFO'), logger=logger)
+
+
+def get_module_logger(module):
     logger = getLogger(module)
     logger.addHandler(StreamHandler(sys.stderr))
-    logger.setLevel(DEBUG)
     logger.propagate = False
-    coloredlogs.DEFAULT_LOG_FORMAT = '[%(asctime)s %(levelname)s %(name)s:%(lineno)s] %(message)s'
-    coloredlogs.install(level='DEBUG', logger=logger)
+    coloredlogs.DEFAULT_LOG_FORMAT = '[%(asctime)s %(levelname)s] %(message)s'
+    coloredlogs.install(level=os.environ.get('GH2DB_LOG_LEVEL', 'INFO'), logger=logger)
     return logger

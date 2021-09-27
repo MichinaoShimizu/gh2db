@@ -1,26 +1,31 @@
 from __future__ import print_function
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy import create_engine
+
 import os
-from sqlalchemy_utils import database_exists, create_database
+
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy_utils import create_database, database_exists
+
+from .logger import get_module_logger, handle_db_logger
+
+handle_db_logger()
+logger = get_module_logger(__name__)
 
 
 class BaseEngine(object):
     def __init__(self):
         url = '{}://{}:{}@{}:{}/{}'.format(
-            os.environ.get('GH2DB_DB_DIALECT'),
-            os.environ.get('GH2DB_DB_USERNAME'),
-            os.environ.get('GH2DB_DB_PASSWORD'),
-            os.environ.get('GH2DB_DB_HOSTNAME'),
-            os.environ.get('GH2DB_DB_PORT'),
-            os.environ.get('GH2DB_DB_NAME')
+            os.environ.get('GH2DB_DB_DIALECT', 'mysql'),
+            os.environ.get('GH2DB_DB_USERNAME', 'root'),
+            os.environ.get('GH2DB_DB_PASSWORD', ''),
+            os.environ.get('GH2DB_DB_HOSTNAME', 'localhost'),
+            os.environ.get('GH2DB_DB_PORT', '22'),
+            os.environ.get('GH2DB_DB_NAME', 'gh2db')
         )
 
-        echo_type = True
-        if os.environ.get('GH2DB_QUERY_ECHO_TYPE') == '1':
-            echo_type = True
+        logger.info('DB:{}'.format(url))
 
-        engine = create_engine(url, echo=echo_type)
+        engine = create_engine(url, echo=False)
         if not database_exists(engine.url):
             create_database(engine.url)
 

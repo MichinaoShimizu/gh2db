@@ -17,7 +17,7 @@ export GH2DB_DB_PASSWORD=
 export GH2DB_DB_HOSTNAME=localhost
 export GH2DB_DB_PORT=22
 export GH2DB_DB_NAME=gh
-export GH2DB_QUERY_ECHO_TYPE=1
+export GH2DB_LOG_LEVEL=INFO
 ```
 
 ```bash

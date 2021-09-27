@@ -1,14 +1,13 @@
 from __future__ import print_function
+
 from .dbbase import BaseEngine, BaseSession
-from .model import Base
-from .model import GithubUser
-from .model import GithubUserRepository
-from .model import GithubUserRepositoryPullRequest
-from .model import GithubOrganization
-from .model import GithubOrganizationTeam
-from .model import GithubOrganizationUser
-from .model import GithubOrganizationRepository
-from .model import GithubOrganizationRepositoryPullRequest
+from .logger import get_module_logger
+from .model import (Base, GithubOrganization, GithubOrganizationRepository,
+                    GithubOrganizationRepositoryPullRequest,
+                    GithubOrganizationTeam, GithubOrganizationUser, GithubUser,
+                    GithubUserRepository, GithubUserRepositoryPullRequest)
+
+logger = get_module_logger(__name__)
 
 
 class Migration(object):
