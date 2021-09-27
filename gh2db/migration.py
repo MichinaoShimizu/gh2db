@@ -2,24 +2,28 @@ from __future__ import print_function
 
 from .dbbase import BaseEngine, BaseSession
 from .logger import get_module_logger
-from .model import (Base, GithubOrganization, GithubOrganizationRepository,
-                    GithubOrganizationRepositoryPullRequest,
-                    GithubOrganizationTeam, GithubOrganizationUser, GithubUser,
-                    GithubUserRepository, GithubUserRepositoryPullRequest)
+from .model import (Base, GithubOrganizations, GithubOrganizationTeamMembers,
+                    GithubOrganizationTeams, GithubRepositories,
+                    GithubRepositoryLabels, GithubRepositoryPullRequestCommits,
+                    GithubRepositoryPullRequestLabels,
+                    GithubRepositoryPullRequestReviews,
+                    GithubRepositoryPullRequests, GithubUsers)
 
 logger = get_module_logger(__name__)
 
 
 class Migration(object):
     MODELS = [
-        GithubUser,
-        GithubUserRepository,
-        GithubUserRepositoryPullRequest,
-        GithubOrganization,
-        GithubOrganizationTeam,
-        GithubOrganizationUser,
-        GithubOrganizationRepository,
-        GithubOrganizationRepositoryPullRequest
+        GithubUsers,
+        GithubOrganizations,
+        GithubOrganizationTeams,
+        GithubOrganizationTeamMembers,
+        GithubRepositories,
+        GithubRepositoryLabels,
+        GithubRepositoryPullRequests,
+        GithubRepositoryPullRequestLabels,
+        GithubRepositoryPullRequestCommits,
+        GithubRepositoryPullRequestReviews,
     ]
 
     def __init__(self):
