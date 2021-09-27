@@ -33,6 +33,7 @@ $ gh2db
 usage: [-h] [--update_user_repos] [--update_org_repos] [--create_all] [--drop_all] [--delete_all] [--count_all]
 ```
 
+
 ### Create
 
 ```bash
