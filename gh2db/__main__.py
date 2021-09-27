@@ -1,4 +1,5 @@
 from __future__ import print_function
+from dotenv import load_dotenv, find_dotenv
 import os
 from argparse import ArgumentParser
 from github import Github
@@ -10,9 +11,8 @@ from gh2db.model import GithubOrganization
 from gh2db.model import GithubOrganizationTeam
 from gh2db.model import GithubOrganizationRepository
 from gh2db.migration import Migration
-from dotenv import load_dotenv
-load_dotenv()
 logger = get_logger(__name__)
+load_dotenv(find_dotenv())
 
 
 def get_option():
