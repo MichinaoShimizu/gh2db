@@ -4,13 +4,7 @@
 
 Migrate GitHub data to database.
 
-## Install
-
-```bash
-pip3 install git+https://github.com/MichinaoShimizu/gh2db
-```
-
-## Usage
+## Environment variables
 
 ```bash
 export GH2DB_GITHUB_TOKEN=
@@ -29,6 +23,8 @@ export GH2DB_DB_NAME=gh
 export GH2DB_DB_LOG_LEVEL=ERROR
 export GH2DB_APP_LOG_LEVEL=INFO
 ```
+
+## Usage
 
 ```bash
 $ gh2db
