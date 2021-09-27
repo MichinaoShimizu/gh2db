@@ -1,5 +1,7 @@
 # gh2db
 
+Migrate GitHub data to database.
+
 ## Install
 
 ```bash
