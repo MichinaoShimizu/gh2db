@@ -75,7 +75,7 @@ def main():
         db = BaseSession().session
 
         if args.update_user_repos:
-            logger.info('Create User Model')
+            logger.info('User Model')
             # see https://docs.github.com/en/rest/reference/users
             user = github.get_user()
             model = GithubUsers.createFromGitHub(user)
