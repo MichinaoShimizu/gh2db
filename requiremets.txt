@@ -1,5 +1,5 @@
-PyGithub
-coloredlogs
-sqlalchemy
-mysqlclient
-sqlalchemy-utils
+PyGithub==1.55
+coloredlogs==15.0.1
+sqlalchemy==1.4.25
+mysqlclient==2.0.3
+sqlalchemy-utils==0.37.8

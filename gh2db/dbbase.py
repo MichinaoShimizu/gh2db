@@ -23,11 +23,13 @@ class BaseEngine(object):
             os.environ.get('GH2DB_DB_NAME', 'gh2db')
         )
 
-        logger.info('DB:{}'.format(url))
+        logger.debug(f'DB: {url}')
 
         engine = create_engine(url, echo=False)
         if not database_exists(engine.url):
+            logger.info('Database is not exist.Try Create Database.')
             create_database(engine.url)
+            logger.info('Database create complete.')
 
         self.engine = engine
 

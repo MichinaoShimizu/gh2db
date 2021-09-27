@@ -1,34 +1,24 @@
 from __future__ import print_function
 
 from sqlalchemy import Column, DateTime, Integer, String, Text
-from sqlalchemy.ext.declarative import declarative_base, declared_attr
+from sqlalchemy.ext.declarative import declarative_base
 
 from .logger import get_module_logger
 
 logger = get_module_logger(__name__)
-
-
-@declarative_base
-class Base:
-    __table_args__ = {'mysql_engine': 'InnoDB'}
-
-    @declared_attr
-    def created_at(cls):
-        return Column(DateTime)
-
-    @declared_attr
-    def updated_at(cls):
-        return Column(DateTime)
+Base = declarative_base()
 
 
 class GithubUsers(Base):
-    """GitHub User Master
-    """
     __tablename__ = 'github_users'
+    __table_args__ = {'mysql_engine': 'InnoDB'}
+
     id = Column('id', String(255), primary_key=True)
     name = Column('name', String(255), index=True)
     url = Column('url', String(255))
     avatar_url = Column('avatar_url', String(255))
+    created_at = Column('created_at', DateTime)
+    updated_at = Column('updated_at', DateTime)
 
     def __init__(self, *, id, name, url, avatar_url, created_at, updated_at):
         self.id = id
@@ -50,15 +40,17 @@ class GithubUsers(Base):
 
 
 class GithubRepositories(Base):
-    """GitHub Repository Master
-    """
     __tablename__ = 'github_repositories'
+    __table_args__ = {'mysql_engine': 'InnoDB'}
+
     id = Column('id', String(255), primary_key=True)
     name = Column('name', String(255), index=True)
     full_name = Column('full_name', String(255), index=True)
     url = Column('url', String(255))
     owner = Column('owner', String(255))
     default_branch = Column('default_branch', String(255), index=True)
+    created_at = Column('created_at', DateTime)
+    updated_at = Column('updated_at', DateTime)
 
     def __init__(self, *, id, name, full_name, url, owner, default_branch, created_at, updated_at):
         self.id = id
@@ -84,9 +76,9 @@ class GithubRepositories(Base):
 
 
 class GithubRepositoryLabels(Base):
-    """GitHub Repository Label Master
-    """
     __tablename__ = 'github_repository_labels'
+    __table_args__ = {'mysql_engine': 'InnoDB'}
+
     repository_id = Column('repository_id', String(255), primary_key=True)
     name = Column('name', String(255), primary_key=True)
     url = Column('url', String(255))
@@ -111,9 +103,9 @@ class GithubRepositoryLabels(Base):
 
 
 class GithubRepositoryPullRequestLabels(Base):
-    """GitHub Repository Pull Request Label Table
-    """
     __tablename__ = 'github_repository_pull_request_labels'
+    __table_args__ = {'mysql_engine': 'InnoDB'}
+
     repository_id = Column('repository_id', String(255), primary_key=True)
     pull_request_id = Column('pull_request_id', String(255), primary_key=True)
     label_name = Column('label_name', String(255), primary_key=True)
@@ -132,9 +124,9 @@ class GithubRepositoryPullRequestLabels(Base):
 
 
 class GithubRepositoryPullRequestCommits(Base):
-    """GitHub Repository Pull Request Commits Table
-    """
     __tablename__ = 'github_repository_pull_request_commits'
+    __table_args__ = {'mysql_engine': 'InnoDB'}
+
     repository_id = Column('repository_id', String(255), primary_key=True)
     pull_request_id = Column('pull_request_id', String(255), primary_key=True)
     sha = Column('sha', String(255), primary_key=True)
@@ -168,9 +160,9 @@ class GithubRepositoryPullRequestCommits(Base):
 
 
 class GithubRepositoryPullRequestReviews(Base):
-    """GitHub Repository Pull Request Reviews Table
-    """
     __tablename__ = 'github_repository_pull_request_reviews'
+    __table_args__ = {'mysql_engine': 'InnoDB'}
+
     repository_id = Column('repository_id', String(255), primary_key=True)
     pull_request_id = Column('pull_request_id', String(255), primary_key=True)
     id = Column('id', String(255), primary_key=True)
@@ -202,9 +194,9 @@ class GithubRepositoryPullRequestReviews(Base):
 
 
 class GithubRepositoryPullRequests(Base):
-    """GitHub Repository Pull Request Master
-    """
     __tablename__ = 'github_repository_pull_requests'
+    __table_args__ = {'mysql_engine': 'InnoDB'}
+
     id = Column('id', String(255), primary_key=True)
     number = Column('number', Integer(), index=True)
     url = Column('url', String(255))
@@ -224,6 +216,8 @@ class GithubRepositoryPullRequests(Base):
     additions = Column('additions', Integer())
     changed_files = Column('changed_files', Integer())
     closed_at = Column('closed_at', DateTime)
+    created_at = Column('created_at', DateTime)
+    updated_at = Column('updated_at', DateTime)
 
     def __init__(self, *, id, number, url, title, user_id, state, base_ref, head_ref, merge_commit_sha, mergeable, mergeable_state, merged_by, merged_at, merged, milestone, deletions, additions, changed_files, closed_at, created_at, updated_at):
         self.id = id
@@ -275,13 +269,15 @@ class GithubRepositoryPullRequests(Base):
 
 
 class GithubOrganizations(Base):
-    """GitHub Repository Organization Master
-    """
     __tablename__ = 'github_organizations'
+    __table_args__ = {'mysql_engine': 'InnoDB'}
+
     id = Column('id', String(255), primary_key=True)
     name = Column('name', String(255), index=True)
     url = Column('url', String(255))
     avatar_url = Column('avatar_url', String(255))
+    created_at = Column('created_at', DateTime)
+    updated_at = Column('updated_at', DateTime)
 
     def __init__(self, *, id, name, url, avatar_url, created_at, updated_at):
         self.id = id
@@ -303,14 +299,16 @@ class GithubOrganizations(Base):
 
 
 class GithubOrganizationTeams(Base):
-    """GitHub Repository Organization Team Master
-    """
     __tablename__ = 'github_organization_teams'
+    __table_args__ = {'mysql_engine': 'InnoDB'}
+
     organization_id = Column('organization_id', String(255), primary_key=True)
     id = Column('id', String(255), primary_key=True)
     name = Column('name', String(255), index=True)
     url = Column('url', String(255))
     avatar_url = Column('avatar_url', String(255))
+    created_at = Column('created_at', DateTime)
+    updated_at = Column('updated_at', DateTime)
 
     def __init__(self, *, organization_id, id, name, url, avatar_url, created_at, updated_at):
         self.organization_id = organization_id
@@ -334,9 +332,9 @@ class GithubOrganizationTeams(Base):
 
 
 class GithubOrganizationTeamMembers(Base):
-    """GitHub Repository Organization Team Member Table
-    """
     __tablename__ = 'github_organization_team_members'
+    __table_args__ = {'mysql_engine': 'InnoDB'}
+
     organization_id = Column('organization_id', String(255), primary_key=True)
     team_id = Column('team_id', String(255), primary_key=True)
     user_id = Column('user_id', String(255), primary_key=True)

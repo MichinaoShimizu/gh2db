@@ -33,160 +33,157 @@ def get_option():
 def main():
     args = get_option()
 
-    # Create tables
     if args.create_all:
         logger.info('Create all tables start')
         Migration().create_all()
+        logger.info('Create all tables completed')
+
         return 0
 
-    # Drop tables
     if args.drop_all:
         logger.info('Drop all tables start')
         Migration().drop_all()
+        logger.info('Drop all tables completed')
+
         return 0
 
-    # Count all of table rows
     if args.count_all:
         logger.info('Count all of table rows start')
         Migration().count_all()
+        logger.info('Count all of table rows completed')
+
         return 0
 
-    # Delete all of table rows
     if args.delete_all:
         logger.info('Delete all of table rows start')
         Migration().delete_all()
+        logger.info('Delete all of table rows completed')
+
         return 0
 
-    # GitHub API
-    github = Github(os.environ.get('GH2DB_GITHUB_TOKEN', ''))
-    logger.info('---------------------------')
-    logger.info('GitHub API Authorized By Personal AccessToken: OK')
-    logger.info('Github API Rate Limitting Information:')
-    logger.info('Remaining, Limit: {}'.format(github.rate_limiting))
-    logger.info('ResetTime: {}'.format(github.get_rate_limit().core.reset))
-    logger.info('---------------------------')
+    if args.update_user_repos or args.update_org_repos:
+        github = Github(os.environ.get('GH2DB_GITHUB_TOKEN', ''))
+        logger.info('---------------------------')
+        logger.info('GitHub API Authorized By Personal AccessToken: OK')
+        logger.info('Github API Rate Limitting Information:')
+        logger.info('Remaining, Limit: {}'.format(github.rate_limiting))
+        logger.info('ResetTime: {}'.format(github.get_rate_limit().core.reset))
+        logger.info('---------------------------')
 
-    # Database Session
-    need_db_session = args.update_user_repos or args.update_org_repos
-    if need_db_session:
         db = BaseSession().session
-        logger.info('Database session established')
 
-    # Update (exeusion user data)
-    if args.update_user_repos:
-        logger.info('Create User Model')
-        user = github.get_user()
-        model = GithubUsers.createFromGitHub(user)
-        db.merge(model)
-
-        logger.info(f' Repository Models (User:{user.name})')
-        repositories = user.get_repos(visibility='all')
-        for repository in repositories:
-            model = GithubRepositories.createFromGitHub(repository)
+        if args.update_user_repos:
+            logger.info('Create User Model')
+            user = github.get_user()
+            model = GithubUsers.createFromGitHub(user)
             db.merge(model)
 
-            logger.info(f'  Label Models (Repository:{repository.full_name})')
-            labels = repository.get_labels()
-            for label in labels:
-                model = GithubRepositoryLabels.createFromGitHub(repository, label)
+            logger.info(f' Repository Models (User:{user.name})')
+            repositories = user.get_repos(visibility='all')
+            for repository in repositories:
+                model = GithubRepositories.createFromGitHub(repository)
                 db.merge(model)
 
-            logger.info(f'  Pull Request Models (Repository:{repository.full_name})')
-            pull_requests = repository.get_pulls(
-                state='closed',
-                sort='merged',
-                base=repository.default_branch
-            )
-            for pull_request in pull_requests:
-                model = GithubRepositoryPullRequests.createFromGitHub(pull_request)
-                db.merge(model)
-
-                logger.info(f'   Pull Request Label Models (#{pull_request.number})')
-                pull_request_labels = pull_request.get_labels()
-                for pull_request_label in pull_request_labels:
-                    model = GithubRepositoryPullRequestLabels.createFromGitHub(
-                        repository, pull_request, pull_request_label)
+                logger.info(f'  Label Models (Repository:{repository.full_name})')
+                labels = repository.get_labels()
+                for label in labels:
+                    model = GithubRepositoryLabels.createFromGitHub(repository, label)
                     db.merge(model)
 
-                logger.info(f'   Review Models (#{pull_request.number})')
-                reviews = pull_request.get_reviews()
-                for review in reviews:
-                    model = GithubRepositoryPullRequestReviews.createFromGitHub(
-                        repository, pull_request, review)
+                logger.info(f'  Pull Request Models (Repository:{repository.full_name})')
+                pull_requests = repository.get_pulls(
+                    state='closed',
+                    sort='merged',
+                    base=repository.default_branch
+                )
+                for pull_request in pull_requests:
+                    model = GithubRepositoryPullRequests.createFromGitHub(pull_request)
                     db.merge(model)
 
-                logger.info(f'   Commit Models (#{pull_request.number})')
-                commits = pull_request.get_commits()
-                for commit in commits:
-                    model = GithubRepositoryPullRequestCommits.createFromGitHub(
-                        repository, pull_request, commit)
-                    db.merge(model)
+                    logger.info(f'   Pull Request Label Models (#{pull_request.number})')
+                    pull_request_labels = pull_request.get_labels()
+                    for pull_request_label in pull_request_labels:
+                        model = GithubRepositoryPullRequestLabels.createFromGitHub(
+                            repository, pull_request, pull_request_label)
+                        db.merge(model)
 
-    # Update Database (organization data)
-    if args.update_org_repos:
-        target_org_name = os.environ.get('GH2DB_GITHUB_TARGET_ORGANIZATION_NAME', '')
+                    logger.info(f'   Review Models (#{pull_request.number})')
+                    reviews = pull_request.get_reviews()
+                    for review in reviews:
+                        model = GithubRepositoryPullRequestReviews.createFromGitHub(
+                            repository, pull_request, review)
+                        db.merge(model)
 
-        logger.info(f'Organization Model ({target_org_name})')
-        organization = github.get_organization(target_org_name)
-        model = GithubOrganizations.createFromGitHub(organization)
-        db.merge(model)
+                    logger.info(f'   Commit Models (#{pull_request.number})')
+                    commits = pull_request.get_commits()
+                    for commit in commits:
+                        model = GithubRepositoryPullRequestCommits.createFromGitHub(
+                            repository, pull_request, commit)
+                        db.merge(model)
 
-        logger.info(f' Team Models (Organization:{organization.name})')
-        teams = organization.get_teams()
-        for team in teams:
-            model = GithubOrganizationTeams(organization, team)
+        if args.update_org_repos:
+            target_org_name = os.environ.get('GH2DB_GITHUB_TARGET_ORGANIZATION_NAME', '')
+
+            logger.info(f'Organization Model ({target_org_name})')
+            organization = github.get_organization(target_org_name)
+            model = GithubOrganizations.createFromGitHub(organization)
             db.merge(model)
 
-            logger.info(f'  Team Member Models (Team:{team.name})')
-            team_member = team.get_members()
-            for member in team_member:
-                model = GithubOrganizationTeamMembers(organization, team, member)
+            logger.info(f' Team Models (Organization:{organization.name})')
+            teams = organization.get_teams()
+            for team in teams:
+                model = GithubOrganizationTeams(organization, team)
                 db.merge(model)
 
-        logger.info(f' Repository Models (Organization:{organization.name})')
-        repositories = organization.get_repos(visibility='all')
-        for repository in repositories:
-            model = GithubRepositories.createFromGitHub(repository)
-            db.merge(model)
+                logger.info(f'  Team Member Models (Team:{team.name})')
+                team_member = team.get_members()
+                for member in team_member:
+                    model = GithubOrganizationTeamMembers(organization, team, member)
+                    db.merge(model)
 
-            logger.info(f'  Label Models (Repository:{repository.full_name})')
-            labels = repository.get_labels()
-            for label in labels:
-                model = GithubRepositoryLabels.createFromGitHub(repository, label)
+            logger.info(f' Repository Models (Organization:{organization.name})')
+            repositories = organization.get_repos(visibility='all')
+            for repository in repositories:
+                model = GithubRepositories.createFromGitHub(repository)
                 db.merge(model)
 
-            logger.info(f'  Pull Request Models (Organization:{organization.name})')
-            pull_requests = repository.get_pulls(
-                state='closed',
-                sort='merged',
-                base=repository.default_branch
-            )
-            for pull_request in pull_requests:
-                model = GithubRepositoryPullRequests.createFromGitHub(pull_request)
-                db.merge(model)
-
-                logger.info(f'   Pull Request Label Models (#{pull_request.number})')
-                pull_request_labels = pull_request.get_labels()
-                for pull_request_label in pull_request_labels:
-                    model = GithubRepositoryPullRequestLabels.createFromGitHub(
-                        repository, pull_request, pull_request_label)
+                logger.info(f'  Label Models (Repository:{repository.full_name})')
+                labels = repository.get_labels()
+                for label in labels:
+                    model = GithubRepositoryLabels.createFromGitHub(repository, label)
                     db.merge(model)
 
-                logger.info(f'   Review Models (#{pull_request.number})')
-                reviews = pull_request.get_reviews()
-                for review in reviews:
-                    model = GithubRepositoryPullRequestReviews.createFromGitHub(
-                        repository, pull_request, review)
+                logger.info(f'  Pull Request Models (Organization:{organization.name})')
+                pull_requests = repository.get_pulls(
+                    state='closed',
+                    sort='merged',
+                    base=repository.default_branch
+                )
+                for pull_request in pull_requests:
+                    model = GithubRepositoryPullRequests.createFromGitHub(pull_request)
                     db.merge(model)
 
-                logger.info(f'  Commit Models (#{pull_request.number})')
-                commits = pull_request.get_commits()
-                for commit in commits:
-                    model = GithubRepositoryPullRequestCommits.createFromGitHub(
-                        repository, pull_request, commit)
-                    db.merge(model)
+                    logger.info(f'   Pull Request Label Models (#{pull_request.number})')
+                    pull_request_labels = pull_request.get_labels()
+                    for pull_request_label in pull_request_labels:
+                        model = GithubRepositoryPullRequestLabels.createFromGitHub(
+                            repository, pull_request, pull_request_label)
+                        db.merge(model)
 
-    if need_db_session:
+                    logger.info(f'   Review Models (#{pull_request.number})')
+                    reviews = pull_request.get_reviews()
+                    for review in reviews:
+                        model = GithubRepositoryPullRequestReviews.createFromGitHub(
+                            repository, pull_request, review)
+                        db.merge(model)
+
+                    logger.info(f'  Commit Models (#{pull_request.number})')
+                    commits = pull_request.get_commits()
+                    for commit in commits:
+                        model = GithubRepositoryPullRequestCommits.createFromGitHub(
+                            repository, pull_request, commit)
+                        db.merge(model)
+
         try:
             db.commit()
             logger.info('Database committed')
