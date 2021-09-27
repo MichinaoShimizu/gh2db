@@ -8,16 +8,16 @@ from sqlalchemy_utils import database_exists, create_database
 class BaseEngine(object):
     def __init__(self):
         url = '{}://{}:{}@{}:{}/{}'.format(
-            os.environ['DB_DIALECT'],
-            os.environ['DB_USERNAME'],
-            os.environ['DB_PASSWORD'],
-            os.environ['DB_HOSTNAME'],
-            os.environ['DB_PORT'],
-            os.environ['DB_NAME']
+            os.environ.get('GH2DB_DB_DIALECT'),
+            os.environ.get('GH2DB_DB_USERNAME'),
+            os.environ.get('GH2DB_DB_PASSWORD'),
+            os.environ.get('GH2DB_DB_HOSTNAME'),
+            os.environ.get('GH2DB_DB_PORT'),
+            os.environ.get('GH2DB_DB_NAME')
         )
 
         echo_type = True
-        if os.environ['DB_ECHO_TYPE'] == '1':
+        if os.environ.get('GH2DB_QUERY_ECHO_TYPE') == '1':
             echo_type = True
 
         engine = create_engine(url, echo=echo_type)
