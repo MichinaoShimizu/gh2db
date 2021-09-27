@@ -1,5 +1,7 @@
 # gh2db
 
+[![PyPI version](https://badge.fury.io/py/gh2db.svg)](https://badge.fury.io/py/gh2db)
+
 Migrate GitHub data to database.
 
 ## Install
